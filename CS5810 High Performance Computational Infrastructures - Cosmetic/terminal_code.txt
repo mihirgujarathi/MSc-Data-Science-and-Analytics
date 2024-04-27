@@ -1,0 +1,25 @@
+(local cmd)
+
+scp "C:\Users\Mihir Gujarathi\Downloads\HPCI\cosmetics.csv" cs2306691@134.83.83.28:CW
+
+scp "C:\Users\Mihir Gujarathi\Downloads\HPCI\ingredients_mapper.py" cs2306691@134.83.83.28:CW
+
+scp "C:\Users\Mihir Gujarathi\Downloads\HPCI\ingredients_reducer.py" cs2306691@134.83.83.28:CW
+
+
+(navigate to where you copied files in linux cluster)
+mkdir CW
+cd CW
+
+
+hadoop fs -mkdir CW
+hadoop fs -copyFromLocal * CW
+
+hadoop jar /usr/local/hadoop-3.3.6/share/hadoop/tools/lib/hadoop-streaming-3.3.6.jar \
+    -files ingredients_mapper.py,ingredients_reducer.py  \
+    -input CW/cosmetics.csv \
+    -output CW/output \
+    -mapper 'python ingredients_mapper.py' \
+    -reducer 'python ingredients_reducer.py'
+
+hadoop fs -cat CW/output/part-00000
